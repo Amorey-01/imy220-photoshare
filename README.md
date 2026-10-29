@@ -1,10 +1,17 @@
-# imy220-photoshare
+# GallerSketch - Deliverable 3 (Final Deliverable)
 
-# Name of app: GallerSketch
+## Running with Docker
+1. Make sure Docker Desktop is running.
+2. From the project root, build and run containers:
+   ```bash
+   docker compose up --build
 
-A photo sharing website built as part of the IMY 220 module at the University of Pretoria (2026).
+   Access the application:
 
-## Overview
-GallerSketch (GallerySketch) is a platform for sharing and discovering art, of all types. Users can post 
-their work, organise pieces into curated albums, and connect with other 
-photographers and artists.
+Frontend: http://localhost:5173
+
+Backend API: http://localhost:5000/api
+
+Stop Containers: docker compose down
+
+Rebuild: docker compose up --build --force-recreate

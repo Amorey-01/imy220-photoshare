@@ -1,30 +1,25 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Header from '../components/Header';
+import { api } from '../api';
+import PageLayout from '../components/PageLayout';
 import Post from '../components/Post';
-import EditPost from '../components/EditPost';
-
-const dummyPost = {
-  id: 1,
-  imageUrl: 'https://via.placeholder.com/400',
-  description: 'A quick sketch from today',
-  hashtags: ['#sketch', '#art'],
-  author: 'keisha_art',
-  albums: ['Sketchbook 2026'],
-  comments: [
-    { id: 1, author: 'another_artist', text: 'Love this!' },
-    { id: 2, author: 'sketchbook_sam', text: 'Great linework' },
-  ],
-};
 
 function PostPage() {
   const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setPost(null);
+    api(`/posts/${id}`).then(setPost).catch((e) => setError(e.message));
+  }, [id]);
 
   return (
-    <div>
-      <Header />
-      <Post post={dummyPost} />
-      <EditPost post={dummyPost} />
-    </div>
+    <PageLayout>
+      {error && <p className="error">{error}</p>}
+      {!post && !error && <p className="text-muted">Loading…</p>}
+      {post && <Post post={post} onChange={setPost} />}
+    </PageLayout>
   );
 }
 

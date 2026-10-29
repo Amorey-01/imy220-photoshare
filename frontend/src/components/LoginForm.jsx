@@ -1,60 +1,43 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
-  const isValid = email.includes('@') && password.length > 0;
+  const [busy, setBusy] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!email || !password) {
-      setError('Both fields are required.');
-      return;
-    }
-    if (!email.includes('@')) {
-      setError('Enter a valid email address.');
-      return;
-    }
+    if (!email || !password) return setError('Both fields are required.');
+    if (!email.includes('@')) return setError('Enter a valid email address.');
     setError('');
-
+    setBusy(true);
     try {
-      const response = await fetch('http://localhost:5000/api/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      console.log('Sign-in response:', data);
+      await login(email, password);
+      navigate('/home');
     } catch (err) {
-      console.error('Sign-in request failed:', err);
+      setError(err.message);
+    } finally {
+      setBusy(false);
     }
-
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Log In</h3>
-      {error && <p>{error}</p>}
-
-      <label htmlFor="loginEmail">Email</label>
-      <input
-        id="loginEmail"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <label htmlFor="loginPassword">Password</label>
-      <input
-        id="loginPassword"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <button type="submit" disabled={!isValid}>Log In</button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <p className="error">{error}</p>}
+      <div>
+        <label htmlFor="loginEmail" className="label">Email</label>
+        <input id="loginEmail" type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
+      </div>
+      <div>
+        <label htmlFor="loginPassword" className="label">Password</label>
+        <input id="loginPassword" type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} />
+      </div>
+      <button type="submit" className="btn-primary w-full" disabled={busy}>{busy ? 'Logging in…' : 'Log In'}</button>
     </form>
   );
 }

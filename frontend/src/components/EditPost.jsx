@@ -1,36 +1,38 @@
 import { useState } from 'react';
+import { api } from '../api';
 
-function EditPost({ post }) {
+function EditPost({ post, onSaved, onCancel }) {
   const [description, setDescription] = useState(post.description);
-  const [hashtags, setHashtags] = useState(post.hashtags.join(' '));
+  const [hashtags, setHashtags] = useState(post.hashtags.map((t) => `#${t}`).join(' '));
+  const [error, setError] = useState('');
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log('Updated post:', { description, hashtags });
+    try {
+      onSaved(await api(`/posts/${post._id}`, { method: 'PUT', body: { description, hashtags } }));
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Edit Post</h3>
-      <label htmlFor="editDescription">Description</label>
-      <textarea
-        id="editDescription"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      <label htmlFor="editHashtags">Hashtags</label>
-      <input
-        id="editHashtags"
-        type="text"
-        value={hashtags}
-        onChange={(e) => setHashtags(e.target.value)}
-      />
-
-      <button type="submit">Save Changes</button>
+    <form onSubmit={handleSubmit} className="space-y-3 rounded-xl bg-sand/60 p-4">
+      <h3 className="text-lg font-semibold">Edit Post</h3>
+      {error && <p className="error">{error}</p>}
+      <div>
+        <label htmlFor="editDescription" className="label">Description</label>
+        <textarea id="editDescription" rows={3} className="input" value={description} onChange={(e) => setDescription(e.target.value)} />
+      </div>
+      <div>
+        <label htmlFor="editHashtags" className="label">Hashtags</label>
+        <input id="editHashtags" className="input" value={hashtags} onChange={(e) => setHashtags(e.target.value)} />
+      </div>
+      <div className="flex gap-2">
+        <button type="submit" className="btn-primary">Save Changes</button>
+        <button type="button" className="btn-ghost" onClick={onCancel}>Cancel</button>
+      </div>
     </form>
   );
-
 }
 
 export default EditPost;

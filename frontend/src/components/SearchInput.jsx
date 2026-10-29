@@ -1,17 +1,14 @@
-import { useState } from 'react';
-
-function SearchInput() {
-  const [query, setQuery] = useState('');
-
+function SearchInput({ value, onChange }) {
   return (
-    <div>
-      <label htmlFor="search">Search</label>
+    <div className="w-full sm:max-w-xs">
+      <label htmlFor="search" className="sr-only">Search</label>
       <input
         id="search"
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search users, posts, hashtags..."
+        type="search"
+        className="input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search posts, hashtags, people…"
       />
     </div>
   );

@@ -1,14 +1,31 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
     ports:
       - "5000:5000"
+    environment:
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017}
+      DB_NAME: ${DB_NAME:-frame}
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+    restart: unless-stopped
+    depends_on:
+      - mongo
 
   frontend:
     build: ./frontend
     ports:
       - "5173:5173"
+    environment:
+      API_TARGET: http://backend:5000
     depends_on:
       - backend
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
